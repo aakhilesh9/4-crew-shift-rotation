@@ -3,8 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Shift Calendar (A-Crew)</title>
+  <title>Shift Calendar (A / B Crew)</title>
   <style>
+    .festival-box {
+      margin-top: 0.6rem;
+      padding: 0.6rem;
+      background: #020617;
+      border-top: 1px solid #1e293b;
+      font-size: 0.75rem;
+    }
+
+    .festival-title {
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+      color: #fbbf24;
+    }
+
+    .festival-item {
+      display: flex;
+      justify-content: space-between;
+      color: #cbd5f5;
+      padding: 2px 0;
+    }
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
@@ -75,7 +95,11 @@
     .E { background: #3b82f6; }
     .N { background: #8b5cf6; }
     .O { background: #22c55e; color: #000; }
-    .today { outline: 3px solid #fff; }
+    .today {
+      position: relative;
+      box-shadow: 0 0 0 3px #fff, 0 0 10px #fff, 0 0 18px rgba(255,255,255,0.6);
+      transform: scale(1.08);
+    }
   </style>
 </head>
 <body>
@@ -105,6 +129,24 @@
   const rotation = ['E','E','E','E','O','M','M','M','M','O','N','N','N','N','O','O'];
 
   const year = 2026;
+  const festivals = [
+  { name: "Makar Sankranti", date: "2026-01-14" },
+  { name: "Republic Day", date: "2026-01-26" },
+  { name: "Holi", date: "2026-03-04" },
+  { name: "Id-Ul-Fitr", date: "2026-03-21" },
+  { name: "Mahavir Jayanti", date: "2026-03-31" },
+  { name: "Buddha Purnima / Labour Day", date: "2026-05-01" },
+  { name: "Id-Ul-Zuha (Bakrid)", date: "2026-05-27" },
+  { name: "Maharana Pratap Jayanti", date: "2026-06-17" },
+  { name: "Independence Day", date: "2026-08-15" },
+  { name: "Raksha Bandhan", date: "2026-08-28" },
+  { name: "Gandhi Jayanti", date: "2026-10-02" },
+  { name: "Dussehra", date: "2026-10-20" },
+  { name: "Govardhan Puja", date: "2026-11-09" },
+  { name: "Bhai Dooj", date: "2026-11-11" },
+  { name: "Gurunanak Jayanti", date: "2026-11-24" },
+  { name: "Christmas Day", date: "2026-12-25" }
+];
   const today = new Date();
 
   /* Crew anchors */
@@ -185,6 +227,40 @@
     }
 
     app.appendChild(grid);
+    // ---- Festival rendering ----
+const monthFestivals = festivals.filter(f => {
+  const d = new Date(f.date);
+  return d.getMonth() === month;
+});
+
+if (monthFestivals.length > 0) {
+  const box = document.createElement('div');
+  box.className = 'festival-box';
+
+  const title = document.createElement('div');
+  title.className = 'festival-title';
+  title.textContent = "Festivals";
+  box.appendChild(title);
+
+  monthFestivals.forEach(f => {
+    const d = new Date(f.date);
+
+    const item = document.createElement('div');
+    item.className = 'festival-item';
+
+    const name = document.createElement('span');
+    name.textContent = f.name;
+
+    const date = document.createElement('span');
+    date.textContent = d.getDate();
+
+    item.appendChild(name);
+    item.appendChild(date);
+    box.appendChild(item);
+  });
+
+  app.appendChild(box);
+}
   }
 
   // Month dropdown
