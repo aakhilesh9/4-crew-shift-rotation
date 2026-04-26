@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Shift Calendar (A / B Crew)</title>
   <style>
+
+    .festival-label {
+      font-size: 0.55rem;
+      line-height: 1.1;
+      margin-top: 2px;
+      color: #fbbf24;
+      text-align: center;
+      word-break: break-word;
+    }
+
     .festival-box {
       margin-top: 0.6rem;
       padding: 0.6rem;
@@ -66,6 +76,11 @@
       font-size: 0.65rem;
       color: #94a3b8;
     }
+
+    .cell {
+      min-height: 4.2rem; /* slightly taller */
+    }
+
     .cell {
       background: #020617;
       border-radius: 0.6rem;
@@ -204,6 +219,10 @@
 
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
+      const todaysFestivals = festivals.filter(f => {
+      const d = new Date(f.date);
+      return d.toDateString() === date.toDateString();
+    });
       const shift = getShift(date);
 
       const cell = document.createElement('div');
@@ -223,6 +242,18 @@
 
       cell.appendChild(dEl);
       cell.appendChild(sEl);
+
+      // ---- Add festival label inside cell ----
+      if (todaysFestivals.length > 0) {
+        const fEl = document.createElement('div');
+        fEl.className = 'festival-label';
+
+        fEl.innerHTML = todaysFestivals
+          .map(f => f.short || f.name)
+          .join('<br>');
+
+        cell.appendChild(fEl);
+      }
       grid.appendChild(cell);
     }
 
