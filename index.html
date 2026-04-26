@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shift Calendar (A-Crew)</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+    }
+    header {
+      padding: 0.75rem 1rem;
+      background: #020617;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header h1 {
+      font-size: 0.95rem;
+      margin: 0;
+      font-weight: 600;
+    }
+    select {
+      background: #020617;
+      color: #e5e7eb;
+      border: 1px solid #334155;
+      padding: 0.35rem 0.45rem;
+      border-radius: 0.4rem;
+      font-size: 0.85rem;
+    }
+    .calendar { padding: 0.5rem; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.4rem;
+    }
+    .dow {
+      text-align: center;
+      font-size: 0.65rem;
+      color: #94a3b8;
+    }
+    .cell {
+      background: #020617;
+      border-radius: 0.6rem;
+      padding: 0.4rem 0.2rem;
+      text-align: center;
+      min-height: 3.4rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .date {
+      font-size: 0.65rem;
+      color: #cbd5f5;
+    }
+    .shift {
+      font-size: 1.05rem;
+      font-weight: 700;
+      width: 2.1rem;
+      height: 2.1rem;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+    }
+    .M { background: #f59e0b; color: #000; }
+    .E { background: #3b82f6; }
+    .N { background: #8b5cf6; }
+    .O { background: #22c55e; color: #000; }
+    .today { outline: 3px solid #fff; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Shift Calendar</h1>
+  <div style="display:flex;gap:0.4rem;align-items:center;">
+    <button id="prevMonth" style="background:#020617;color:#e5e7eb;border:1px solid #334155;border-radius:0.4rem;padding:0.35rem 0.55rem;">◀</button>
+    <select id="crewSelect">
+      <option value="A">A Crew</option>
+    </select>
+    <select id="monthSelect"></select>
+    <button id="nextMonth" style="background:#020617;color:#e5e7eb;border:1px solid #334155;border-radius:0.4rem;padding:0.35rem 0.55rem;">▶</button>
+  </div>
+</header>
+
+<div id="app" class="calendar"></div>
+
+<div style="padding:0.6rem 0.75rem;font-size:0.75rem;color:#cbd5f5;border-top:1px solid #1e293b;background:#020617;">
+  <strong>M</strong> = Morning (7 AM – 3 PM)<br>
+  <strong>E</strong> = Evening (3 PM – 11 PM)<br>
+  <strong>N</strong> = Night (11 PM of previous day – 7 AM)
+</div>
+
+<script>
+  /* 16‑day rotation */
+  const rotation = ['E','E','E','E','O','M','M','M','M','O','N','N','N','N','O','O'];
+
+  const year = 2026;
+  const today = new Date();
+
+  /* Crew anchors */
+  const crews = {
+    // A-crew: 1 Feb 2026 = first N block
+    A: { date: new Date(2026, 1, 1), index: 10 },
+
+    // B-crew: 1 Jan 2026 = third M
+    B: { date: new Date(2026, 0, 1), index: 7 },
+
+    // C-crew: 1 Jan 2026 = last E
+    C: { date: new Date(2026, 0, 1), index: 3 },
+
+    // D-crew: 2 Jan 2026 = first E
+    D: { date: new Date(2026, 0, 2), index: 0 }
+  };
+
+  const app = document.getElementById('app');
+  const monthSelect = document.getElementById('monthSelect');
+  const prevBtn = document.getElementById('prevMonth');
+  const nextBtn = document.getElementById('nextMonth');
+  const crewSelect = document.getElementById('crewSelect');
+
+  function daysBetween(d1, d2) {
+    return Math.floor((d2 - d1) / (24 * 60 * 60 * 1000));
+  }
+
+  function getShift(date) {
+    const crew = crews[crewSelect.value];
+    const diff = daysBetween(crew.date, date);
+    const idx = (crew.index + diff % rotation.length + rotation.length) % rotation.length;
+    return rotation[idx];
+  }
+
+  function renderMonth(month) {
+    app.innerHTML = '';
+
+    const firstDay = new Date(year, month, 1);
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const startWeekday = firstDay.getDay();
+
+    const grid = document.createElement('div');
+    grid.className = 'grid';
+
+    ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d => {
+      const h = document.createElement('div');
+      h.className = 'dow';
+      h.textContent = d;
+      grid.appendChild(h);
+    });
+
+    for (let i = 0; i < startWeekday; i++) {
+      grid.appendChild(document.createElement('div'));
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, month, day);
+      const shift = getShift(date);
+
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+
+      const dEl = document.createElement('div');
+      dEl.className = 'date';
+      dEl.textContent = day;
+
+      const sEl = document.createElement('div');
+      sEl.className = 'shift ' + shift;
+      sEl.textContent = shift;
+
+      if (date.toDateString() === today.toDateString()) {
+        sEl.classList.add('today');
+      }
+
+      cell.appendChild(dEl);
+      cell.appendChild(sEl);
+      grid.appendChild(cell);
+    }
+
+    app.appendChild(grid);
+  }
+
+  // Month dropdown
+  for (let m = 0; m < 12; m++) {
+    const opt = document.createElement('option');
+    opt.value = m;
+    opt.textContent = new Date(year, m).toLocaleString('default', { month: 'long', year: 'numeric' });
+    monthSelect.appendChild(opt);
+  }
+
+  monthSelect.addEventListener('change', () => renderMonth(+monthSelect.value));
+  crewSelect.addEventListener('change', () => renderMonth(+monthSelect.value));
+
+  prevBtn.addEventListener('click', () => {
+    let m = Number(monthSelect.value) - 1;
+    if (m < 0) m = 11;
+    monthSelect.value = m;
+    renderMonth(m);
+  });
+
+  nextBtn.addEventListener('click', () => {
+    let m = Number(monthSelect.value) + 1;
+    if (m > 11) m = 0;
+    monthSelect.value = m;
+    renderMonth(m);
+  });
+  crewSelect.addEventListener('change', () => renderMonth(+monthSelect.value));
+
+  const defaultMonth = (today.getFullYear() === year) ? today.getMonth() : 0;
+  monthSelect.value = defaultMonth;
+  renderMonth(defaultMonth);
+</script>
+
+<script>
+  // ---- PWA SETUP (no extra files needed) ----
+  const manifest = {
+    name: "Crew Shift Calendar",
+    short_name: "ShiftCal",
+    start_url: ".",
+    display: "standalone",
+    background_color: "#020617",
+    theme_color: "#020617",
+    icons: [
+      {
+        src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23020617'/%3E%3Ctext x='50' y='65' font-size='48' text-anchor='middle' fill='white'%3EC%3C/text%3E%3C/svg%3E",
+        sizes: "192x192",
+        type: "image/svg+xml"
+      }
+    ]
+  };
+
+  const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+  const manifestURL = URL.createObjectURL(manifestBlob);
+
+  const link = document.createElement('link');
+  link.rel = 'manifest';
+  link.href = manifestURL;
+  document.head.appendChild(link);
+
+  if ('serviceWorker' in navigator) {
+    const swCode = `
+      const CACHE = 'shift-calendar-v1';
+      self.addEventListener('install', e => {
+        e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./'])));
+      });
+      self.addEventListener('fetch', e => {
+        e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+      });
+    `;
+
+    const swBlob = new Blob([swCode], { type: 'text/javascript' });
+    const swURL = URL.createObjectURL(swBlob);
+
+    navigator.serviceWorker.register(swURL);
+  }
+</script>
+<script>
+  // ---- PWA SETUP (no extra files needed) ----
+  const manifest = {
+    name: "Crew Shift Calendar",
+    short_name: "ShiftCal",
+    start_url: ".",
+    display: "standalone",
+    background_color: "#020617",
+    theme_color: "#020617",
+    icons: [
+      {
+        src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23020617'/%3E%3Ctext x='50' y='65' font-size='48' text-anchor='middle' fill='white'%3EC%3C/text%3E%3C/svg%3E",
+        sizes: "192x192",
+        type: "image/svg+xml"
+      }
+    ]
+  };
+
+  const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+  const manifestURL = URL.createObjectURL(manifestBlob);
+
+  const link = document.createElement('link');
+  link.rel = 'manifest';
+  link.href = manifestURL;
+  document.head.appendChild(link);
+
+  if ('serviceWorker' in navigator) {
+    const swCode = `
+      const CACHE = 'shift-calendar-v1';
+      self.addEventListener('install', e => {
+        e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./'])));
+      });
+      self.addEventListener('fetch', e => {
+        e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+      });
+    `;
+
+    const swBlob = new Blob([swCode], { type: 'text/javascript' });
+    const swURL = URL.createObjectURL(swBlob);
+
+    navigator.serviceWorker.register(swURL);
+  }
+</script>
+</body>
+</html>
