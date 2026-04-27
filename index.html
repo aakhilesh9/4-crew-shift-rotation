@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Shift Calendar (A-Crew)</title>
   <style>
+
+    header {
+      padding: 1rem;
+      background: #020617;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      flex-direction: column; /* Stack title and controls vertically */
+      align-items: center;
+      justify-content: center;
+    }
+
     body {
       margin: 0;
       font-family: system-ui, -apple-system, sans-serif;
@@ -146,11 +159,17 @@
 <body>
 
 <header>
+  <header style="flex-direction: column; gap: 0.5rem;">
+  <div style="color: #fbbf24; font-size: 1.1rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;">
+    Shift Schedule-2026 
+  </div>
   <div class="nav-controls">
     <button id="prevMonth">◀</button>
     <select id="monthSelect"></select>
     <button id="nextMonth">▶</button>
   </div>
+</header>
+  
 </header>
 
 <div id="app" class="calendar"></div>
