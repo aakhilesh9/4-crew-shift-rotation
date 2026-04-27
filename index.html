@@ -6,16 +6,13 @@
   <title>Shift Calendar (A-Crew)</title>
   <style>
 
-    header {
-      padding: 1rem;
-      background: #020617;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      display: flex;
-      flex-direction: column; /* Stack title and controls vertically */
-      align-items: center;
-      justify-content: center;
+    :root {
+      --accent: #3b82f6;
+      --accent-soft: #60a5fa;
+    }
+
+    * {
+      transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
     }
 
     body {
@@ -27,21 +24,34 @@
       flex-direction: column;
       min-height: 100vh;
     }
+
     header {
-      padding: 0.75rem 1rem;
+      padding: 1rem;
       background: #020617;
       position: sticky;
       top: 0;
       z-index: 10;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      gap: 0.5rem;
     }
+
+    .title {
+      color: var(--accent);
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
     .nav-controls {
       display: flex;
       gap: 0.5rem;
       align-items: center;
     }
+
     button {
       cursor: pointer;
       border: 1px solid #334155;
@@ -50,6 +60,11 @@
       border-radius: 0.4rem;
       padding: 0.35rem 0.6rem;
     }
+
+    button:hover {
+      border-color: var(--accent);
+    }
+
     select {
       background: #020617;
       color: #e5e7eb;
@@ -58,18 +73,22 @@
       border-radius: 0.4rem;
       font-size: 0.85rem;
     }
-    .calendar { padding: 0.5rem; flex-grow: 0; }
+
+    .calendar { padding: 0.5rem; }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 0.3rem;
     }
+
     .dow {
       text-align: center;
-      font-size: 1.0rem;
+      font-size: 1rem;
       color: #ffffff;
       padding-bottom: 0.2rem;
     }
+
     .cell {
       background: #020617;
       border-radius: 0.6rem;
@@ -81,7 +100,13 @@
       justify-content: flex-start;
       border: 1px solid #1e293b;
     }
-    .date { font-size: 0.85rem; color: #94a3b8; margin-bottom: 2px; }
+
+    .date {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      margin-bottom: 2px;
+    }
+
     .shift {
       font-size: 1rem;
       font-weight: 700;
@@ -93,14 +118,15 @@
       justify-content: center;
       border-radius: 50%;
     }
+
     .M { background: #f59e0b; color: #000; }
     .E { background: #3b82f6; color: #fff; }
     .N { background: #8b5cf6; color: #fff; }
     .O { background: #22c55e; color: #000; font-weight: 400; }
-    
+
     .today {
-      border: 2px solid #fff;
-      box-shadow: 0 0 10px rgba(255,255,255,0.3);
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 10px var(--accent-soft);
       transform: scale(1.02);
       z-index: 2;
     }
@@ -121,8 +147,22 @@
       border-radius: 0.6rem;
       border: 1px solid #1e293b;
     }
-    .festival-title { font-weight: 600; color: #fbbf24; margin-bottom: 0.5rem; font-size: 0.8rem; }
-    .festival-item { display: flex; justify-content: space-between; font-size: 0.75rem; color: #cbd5f5; padding: 4px 0; border-bottom: 1px solid #1e293b; }
+
+    .festival-title {
+      font-weight: 600;
+      color: #fbbf24;
+      margin-bottom: 0.5rem;
+      font-size: 0.8rem;
+    }
+
+    .festival-item {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: #cbd5f5;
+      padding: 4px 0;
+      border-bottom: 1px solid #1e293b;
+    }
 
     #crewBar {
       position: sticky;
@@ -133,6 +173,7 @@
       display: flex;
       gap: 0.5rem;
     }
+
     .crewBtn {
       flex: 1;
       padding: 0.6rem;
@@ -142,11 +183,13 @@
       color: #94a3b8;
       font-weight: 700;
     }
+
     .crewBtn.active {
-      background: #3b82f6;
+      background: var(--accent);
       color: white;
-      border-color: #60a5fa;
+      border-color: var(--accent-soft);
     }
+
     .legend {
       padding: 0.6rem 0.75rem;
       font-size: 0.7rem;
@@ -154,183 +197,180 @@
       border-top: 1px solid #1e293b;
       background: #0f172a;
     }
+
   </style>
 </head>
 <body>
 
 <header>
-  <header style="flex-direction: column; gap: 0.5rem;">
-  <div style="color: #fbbf24; font-size: 1.1rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;">
-    Shift Schedule-2026 
-  </div>
+  <div class="title">Shift Schedule-2026</div>
   <div class="nav-controls">
     <button id="prevMonth">◀</button>
     <select id="monthSelect"></select>
     <button id="nextMonth">▶</button>
   </div>
 </header>
-  
-</header>
 
 <div id="app" class="calendar"></div>
 
-<div class="legend" style="padding:0.6rem 0.75rem;font-size:0.75rem;color:#cbd5f5;border-top:1px solid #1e293b;background:#020617;">
+<div class="legend">
   <strong>O</strong> = OFF<br>
   <strong>M</strong> = Morning (7 AM – 3 PM)<br>
   <strong>E</strong> = Evening (3 PM – 11 PM)<br>
-  <strong>N</strong> = Night (11 PM of previous day – 7 AM of duty day)<br>
-  </div>
+  <strong>N</strong> = Night (11 PM – 7 AM)
+</div>
 
-<!-- Remove comment to view for all crew
- <div id="crewBar">
+<!-- Remove comment for crew selection
+<div id="crewBar">
   <button class="crewBtn active" data-crew="A">A</button>
   <button class="crewBtn" data-crew="B">B</button>
   <button class="crewBtn" data-crew="C">C</button>
   <button class="crewBtn" data-crew="D">D</button>
-</div>-->
+</div>
+-->
 
 <script>
-  const year = 2026;
-  const rotation = ['E','E','E','E','O','M','M','M','M','O','N','N','N','N','O','O'];
-  
-  const festivals = [
-    { name: "Makar Sankranti", short: "Sankranti", date: "2026-01-14" },
-    { name: "Republic Day", short: "Rep. Day", date: "2026-01-26" },
-    { name: "Holi", short: "Holi", date: "2026-03-04" },
-    { name: "Id-Ul-Fitr", short: "Eid", date: "2026-03-21" },
-    { name: "Mahavir Jayanti", short: "Mahavir J.", date: "2026-03-31" },
-    { name: "Labour Day", short: "Labour", date: "2026-05-01" },
-    { name: "Id-Ul-Zuha", short: "Bakrid", date: "2026-05-27" },
-    { name: "Maharana Pratap Jayanti", short: "Pratap J.", date: "2026-06-17" },
-    { name: "Independence Day", short: "Ind. Day", date: "2026-08-15" },
-    { name: "Raksha Bandhan", short: "Rakhi", date: "2026-08-28" },
-    { name: "Gandhi Jayanti", short: "Gandhi J.", date: "2026-10-02" },
-    { name: "Dussehra", short: "Dussehra", date: "2026-10-20" },
-    { name: "Govardhan Puja", short: "Govardhan", date: "2026-11-09" },
-    { name: "Bhai Dooj", short: "Bhai Dooj", date: "2026-11-11" },
-    { name: "Gurunanak Jayanti", short: "Nanak J.", date: "2026-11-24" },
-    { name: "Christmas Day", short: "Xmas", date: "2026-12-25" }
-  ];
+const year = 2026;
 
-  const crews = {
-    A: { date: new Date(2026, 1, 1), index: 10 },
-    B: { date: new Date(2026, 0, 1), index: 7 },
-    C: { date: new Date(2026, 0, 1), index: 3 },
-    D: { date: new Date(2026, 0, 2), index: 0 }
-  };
+const rotation = ['E','E','E','E','O','M','M','M','M','O','N','N','N','N','O','O'];
 
-  let currentCrew = 'A';
-  const today = new Date();
-  const app = document.getElementById('app');
-  const monthSelect = document.getElementById('monthSelect');
+const crewColors = {
+  A: { accent: '#3b82f6', soft: '#60a5fa' },
+  B: { accent: '#22c55e', soft: '#4ade80' },
+  C: { accent: '#f59e0b', soft: '#fbbf24' },
+  D: { accent: '#ef4444', soft: '#f87171' }
+};
 
-  function daysBetween(d1, d2) {
-    const date1 = new Date(d1.getFullYear(), d1.getMonth(), d1.getDate());
-    const date2 = new Date(d2.getFullYear(), d2.getMonth(), d2.getDate());
-    return Math.round((date2 - date1) / 86400000);
-  }
+const festivals = [
+  { name: "Makar Sankranti", short: "Sankranti", date: "2026-01-14" },
+  { name: "Republic Day", short: "Rep. Day", date: "2026-01-26" },
+  { name: "Holi", short: "Holi", date: "2026-03-04" },
+  { name: "Id-Ul-Fitr", short: "Eid", date: "2026-03-21" },
+  { name: "Mahavir Jayanti", short: "Mahavir J.", date: "2026-03-31" },
+  { name: "Labour Day", short: "Labour", date: "2026-05-01" },
+  { name: "Id-Ul-Zuha", short: "Bakrid", date: "2026-05-27" },
+  { name: "Maharana Pratap Jayanti", short: "Pratap J.", date: "2026-06-17" },
+  { name: "Independence Day", short: "Ind. Day", date: "2026-08-15" },
+  { name: "Raksha Bandhan", short: "Rakhi", date: "2026-08-28" },
+  { name: "Gandhi Jayanti", short: "Gandhi J.", date: "2026-10-02" },
+  { name: "Dussehra", short: "Dussehra", date: "2026-10-20" },
+  { name: "Govardhan Puja", short: "Govardhan", date: "2026-11-09" },
+  { name: "Bhai Dooj", short: "Bhai Dooj", date: "2026-11-11" },
+  { name: "Gurunanak Jayanti", short: "Nanak J.", date: "2026-11-24" },
+  { name: "Christmas Day", short: "Xmas", date: "2026-12-25" }
+];
 
-  function getShift(date) {
-    const crew = crews[currentCrew];
-    const diff = daysBetween(crew.date, date);
-    const idx = (crew.index + diff % rotation.length + rotation.length) % rotation.length;
-    return rotation[idx];
-  }
+const crews = {
+  A: { date: new Date(2026, 1, 1), index: 10 },
+  B: { date: new Date(2026, 0, 1), index: 7 },
+  C: { date: new Date(2026, 0, 1), index: 3 },
+  D: { date: new Date(2026, 0, 2), index: 0 }
+};
 
-  function renderMonth(month) {
-    app.innerHTML = '';
-    const firstDay = new Date(year, month, 1);
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const startWeekday = firstDay.getDay();
+let currentCrew = 'A';
+const today = new Date();
+const app = document.getElementById('app');
+const monthSelect = document.getElementById('monthSelect');
 
-    const grid = document.createElement('div');
-    grid.className = 'grid';
+function applyTheme() {
+  const c = crewColors[currentCrew];
+  document.documentElement.style.setProperty('--accent', c.accent);
+  document.documentElement.style.setProperty('--accent-soft', c.soft);
+}
 
-    ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d => {
-      const h = document.createElement('div');
-      h.className = 'dow';
-      h.textContent = d;
-      grid.appendChild(h);
-    });
+function daysBetween(d1, d2) {
+  return Math.round((d2 - d1) / 86400000);
+}
 
-    for (let i = 0; i < startWeekday; i++) grid.appendChild(document.createElement('div'));
+function getShift(date) {
+  const crew = crews[currentCrew];
+  const diff = daysBetween(crew.date, date);
+  const idx = (crew.index + diff % rotation.length + rotation.length) % rotation.length;
+  return rotation[idx];
+}
 
-    for (let day = 1; day <= daysInMonth; day++) {
-      const date = new Date(year, month, day);
-      const shift = getShift(date);
-      const isToday = date.toDateString() === today.toDateString();
-      
-      // Match festivals (Handling timezone issues by comparing strings)
-      const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-      const foundFestivals = festivals.filter(f => f.date === dateString);
+function renderMonth(month) {
+  app.innerHTML = '';
 
-      const cell = document.createElement('div');
-      cell.className = `cell ${isToday ? 'today' : ''}`;
+  const firstDay = new Date(year, month, 1);
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const startWeekday = firstDay.getDay();
 
-      let festHtml = '';
-      foundFestivals.forEach(f => {
-        festHtml += `<div class="festival-label">${f.short}</div>`;
-      });
+  const grid = document.createElement('div');
+  grid.className = 'grid';
 
-      cell.innerHTML = `
-        <div class="date">${day}</div>
-        <div class="shift ${shift}">${shift}</div>
-        ${festHtml}
-      `;
-      grid.appendChild(cell);
-    }
-    app.appendChild(grid);
-
-    // Month festival list
-    const monthFestivals = festivals.filter(f => {
-      const d = new Date(f.date);
-      return d.getMonth() === month;
-    });
-
-    if (monthFestivals.length) {
-      const box = document.createElement('div');
-      box.className = 'festival-box';
-      box.innerHTML = `<div class="festival-title">Holidays</div>`;
-      monthFestivals.forEach(f => {
-        const d = new Date(f.date).getDate();
-        box.innerHTML += `<div class="festival-item"><span>${f.name}</span><span>${d}</span></div>`;
-      });
-      app.appendChild(box);
-    }
-  }
-
-  /* Crew Selection Button Logic */
-  document.querySelectorAll('.crewBtn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.crewBtn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentCrew = btn.dataset.crew;
-      renderMonth(+monthSelect.value);
-    });
+  ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d => {
+    const h = document.createElement('div');
+    h.className = 'dow';
+    h.textContent = d;
+    grid.appendChild(h);
   });
 
-  // Init Month Select
-  for (let m = 0; m < 12; m++) {
-    const opt = document.createElement('option');
-    opt.value = m;
-    opt.textContent = new Date(year, m).toLocaleString('default', { month: 'long', year: 'numeric' });
-    monthSelect.appendChild(opt);
+  for (let i = 0; i < startWeekday; i++) grid.appendChild(document.createElement('div'));
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = new Date(year, month, day);
+    const shift = getShift(date);
+    const isToday = date.toDateString() === today.toDateString();
+
+    const dateString = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const foundFestivals = festivals.filter(f => f.date === dateString);
+
+    const cell = document.createElement('div');
+    cell.className = `cell ${isToday ? 'today' : ''}`;
+
+    let festHtml = '';
+    foundFestivals.forEach(f => {
+      festHtml += `<div class="festival-label">${f.short}</div>`;
+    });
+
+    cell.innerHTML = `
+      <div class="date">${day}</div>
+      <div class="shift ${shift}">${shift}</div>
+      ${festHtml}
+    `;
+    grid.appendChild(cell);
   }
 
-  monthSelect.addEventListener('change', () => renderMonth(+monthSelect.value));
-  document.getElementById('prevMonth').addEventListener('click', () => {
-    monthSelect.value = (Number(monthSelect.value) + 11) % 12;
+  app.appendChild(grid);
+}
+
+document.querySelectorAll('.crewBtn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.crewBtn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    currentCrew = btn.dataset.crew;
+    applyTheme();
     renderMonth(+monthSelect.value);
   });
-  document.getElementById('nextMonth').addEventListener('click', () => {
-    monthSelect.value = (Number(monthSelect.value) + 1) % 12;
-    renderMonth(+monthSelect.value);
-  });
+});
 
-  const currentMonth = (today.getFullYear() === year) ? today.getMonth() : 0;
-  monthSelect.value = currentMonth;
-  renderMonth(currentMonth);
+for (let m = 0; m < 12; m++) {
+  const opt = document.createElement('option');
+  opt.value = m;
+  opt.textContent = new Date(year, m).toLocaleString('default', { month: 'long', year: 'numeric' });
+  monthSelect.appendChild(opt);
+}
 
+monthSelect.addEventListener('change', () => renderMonth(+monthSelect.value));
+
+document.getElementById('prevMonth').onclick = () => {
+  monthSelect.value = (Number(monthSelect.value)+11)%12;
+  renderMonth(+monthSelect.value);
+};
+
+document.getElementById('nextMonth').onclick = () => {
+  monthSelect.value = (Number(monthSelect.value)+1)%12;
+  renderMonth(+monthSelect.value);
+};
+
+applyTheme();
+
+const currentMonth = (today.getFullYear() === year) ? today.getMonth() : 0;
+monthSelect.value = currentMonth;
+renderMonth(currentMonth);
 </script>
+
 </body>
 </html>
