@@ -3,43 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Shift Calendar (A / B Crew)</title>
+  <title>Shift Calendar (A-Crew)</title>
   <style>
-
-    .festival-label {
-      font-size: 0.55rem;
-      line-height: 1.1;
-      margin-top: 2px;
-      color: #fbbf24;
-      text-align: center;
-      word-break: break-word;
-    }
-
-    .festival-box {
-      margin-top: 0.6rem;
-      padding: 0.6rem;
-      background: #020617;
-      border-top: 1px solid #1e293b;
-      font-size: 0.75rem;
-    }
-
-    .festival-title {
-      font-weight: 600;
-      margin-bottom: 0.3rem;
-      color: #fbbf24;
-    }
-
-    .festival-item {
-      display: flex;
-      justify-content: space-between;
-      color: #cbd5f5;
-      padding: 2px 0;
-    }
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: system-ui, -apple-system, sans-serif;
       background: #0f172a;
       color: #e5e7eb;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
     header {
       padding: 0.75rem 1rem;
@@ -48,14 +21,21 @@
       top: 0;
       z-index: 10;
       display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .nav-controls {
+      display: flex;
       gap: 0.5rem;
       align-items: center;
-      justify-content: space-between;
     }
-    header h1 {
-      font-size: 0.95rem;
-      margin: 0;
-      font-weight: 600;
+    button {
+      cursor: pointer;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: white;
+      border-radius: 0.4rem;
+      padding: 0.35rem 0.6rem;
     }
     select {
       background: #020617;
@@ -65,132 +45,174 @@
       border-radius: 0.4rem;
       font-size: 0.85rem;
     }
-    .calendar { padding: 0.5rem; }
+    .calendar { padding: 0.5rem; flex-grow: 1; }
     .grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 0.4rem;
+      gap: 0.3rem;
     }
     .dow {
       text-align: center;
-      font-size: 0.65rem;
-      color: #94a3b8;
+      font-size: 1.0rem;
+      color: #ffffff;
+      padding-bottom: 0.2rem;
     }
-
-    .cell {
-      min-height: 4.2rem; /* slightly taller */
-    }
-
     .cell {
       background: #020617;
       border-radius: 0.6rem;
-      padding: 0.4rem 0.2rem;
+      padding: 0.4rem 0.1rem;
       text-align: center;
-      min-height: 3.4rem;
+      min-height: 4.8rem;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: flex-start;
+      border: 1px solid #1e293b;
     }
-    .date {
-      font-size: 0.65rem;
-      color: #cbd5f5;
-    }
+    .date { font-size: 0.85rem; color: #94a3b8; margin-bottom: 2px; }
     .shift {
-      font-size: 1.05rem;
+      font-size: 1rem;
       font-weight: 700;
-      width: 2.1rem;
-      height: 2.1rem;
+      width: 2rem;
+      height: 2rem;
       margin: 0 auto;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 999px;
+      border-radius: 50%;
     }
     .M { background: #f59e0b; color: #000; }
-    .E { background: #3b82f6; }
-    .N { background: #8b5cf6; }
-    .O { background: #22c55e; color: #000; }
+    .E { background: #3b82f6; color: #fff; }
+    .N { background: #8b5cf6; color: #fff; }
+    .O { background: #22c55e; color: #000; font-weight: 400; }
+    
     .today {
-      position: relative;
-      box-shadow: 0 0 0 3px #fff, 0 0 10px #fff, 0 0 18px rgba(255,255,255,0.6);
-      transform: scale(1.08);
+      border: 2px solid #fff;
+      box-shadow: 0 0 10px rgba(255,255,255,0.3);
+      transform: scale(1.02);
+      z-index: 2;
+    }
+
+    .festival-label {
+      font-size: 0.5rem;
+      line-height: 1;
+      margin-top: 4px;
+      color: #fbbf24;
+      font-weight: 600;
+      word-break: break-word;
+    }
+
+    .festival-box {
+      margin-top: 1rem;
+      padding: 0.75rem;
+      background: #020617;
+      border-radius: 0.6rem;
+      border: 1px solid #1e293b;
+    }
+    .festival-title { font-weight: 600; color: #fbbf24; margin-bottom: 0.5rem; font-size: 0.8rem; }
+    .festival-item { display: flex; justify-content: space-between; font-size: 0.75rem; color: #cbd5f5; padding: 4px 0; border-bottom: 1px solid #1e293b; }
+
+    #crewBar {
+      position: sticky;
+      bottom: 0;
+      background: #020617;
+      border-top: 1px solid #1e293b;
+      padding: 0.75rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+    .crewBtn {
+      flex: 1;
+      padding: 0.6rem;
+      border-radius: 0.5rem;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #94a3b8;
+      font-weight: 700;
+    }
+    .crewBtn.active {
+      background: #3b82f6;
+      color: white;
+      border-color: #60a5fa;
+    }
+    .legend {
+      padding: 0.6rem 0.75rem;
+      font-size: 0.7rem;
+      color: #94a3b8;
+      background: #0f172a;
+      text-align: center;
     }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>Shift Calendar</h1>
-  <div style="display:flex;gap:0.4rem;align-items:center;">
-    <button id="prevMonth" style="background:#020617;color:#e5e7eb;border:1px solid #334155;border-radius:0.4rem;padding:0.35rem 0.55rem;">◀</button>
-    <select id="crewSelect">
-      <option value="A">A Crew</option>
-    </select>
+  <div class="nav-controls">
+    <button id="prevMonth">◀</button>
     <select id="monthSelect"></select>
-    <button id="nextMonth" style="background:#020617;color:#e5e7eb;border:1px solid #334155;border-radius:0.4rem;padding:0.35rem 0.55rem;">▶</button>
+    <button id="nextMonth">▶</button>
   </div>
 </header>
 
 <div id="app" class="calendar"></div>
 
-<div style="padding:0.6rem 0.75rem;font-size:0.75rem;color:#cbd5f5;border-top:1px solid #1e293b;background:#020617;">
+<div class="legend" style="padding:0.6rem 0.75rem;font-size:0.75rem;color:#cbd5f5;border-top:1px solid #1e293b;background:#020617;">
+  <strong>O</strong> = OFF<br>
   <strong>M</strong> = Morning (7 AM – 3 PM)<br>
   <strong>E</strong> = Evening (3 PM – 11 PM)<br>
-  <strong>N</strong> = Night (11 PM of previous day – 7 AM)
-</div>
+  <strong>N</strong> = Night (11 PM of previous day – 7 AM of duty day)<br>
+  </div>
+
+<!-- Remove comment to view for all crew
+ <div id="crewBar">
+  <button class="crewBtn active" data-crew="A">A</button>
+  <button class="crewBtn" data-crew="B">B</button>
+  <button class="crewBtn" data-crew="C">C</button>
+  <button class="crewBtn" data-crew="D">D</button>
+</div>-->
 
 <script>
-  /* 16‑day rotation */
-  const rotation = ['E','E','E','E','O','M','M','M','M','O','N','N','N','N','O','O'];
-
   const year = 2026;
+  const rotation = ['E','E','E','E','O','M','M','M','M','O','N','N','N','N','O','O'];
+  
   const festivals = [
-  { name: "Makar Sankranti", date: "2026-01-14" },
-  { name: "Republic Day", date: "2026-01-26" },
-  { name: "Holi", date: "2026-03-04" },
-  { name: "Id-Ul-Fitr", date: "2026-03-21" },
-  { name: "Mahavir Jayanti", date: "2026-03-31" },
-  { name: "Buddha Purnima / Labour Day", date: "2026-05-01" },
-  { name: "Id-Ul-Zuha (Bakrid)", date: "2026-05-27" },
-  { name: "Maharana Pratap Jayanti", date: "2026-06-17" },
-  { name: "Independence Day", date: "2026-08-15" },
-  { name: "Raksha Bandhan", date: "2026-08-28" },
-  { name: "Gandhi Jayanti", date: "2026-10-02" },
-  { name: "Dussehra", date: "2026-10-20" },
-  { name: "Govardhan Puja", date: "2026-11-09" },
-  { name: "Bhai Dooj", date: "2026-11-11" },
-  { name: "Gurunanak Jayanti", date: "2026-11-24" },
-  { name: "Christmas Day", date: "2026-12-25" }
-];
-  const today = new Date();
+    { name: "Makar Sankranti", short: "Sankranti", date: "2026-01-14" },
+    { name: "Republic Day", short: "Rep. Day", date: "2026-01-26" },
+    { name: "Holi", short: "Holi", date: "2026-03-04" },
+    { name: "Id-Ul-Fitr", short: "Eid", date: "2026-03-21" },
+    { name: "Mahavir Jayanti", short: "Mahavir J.", date: "2026-03-31" },
+    { name: "Labour Day", short: "Labour", date: "2026-05-01" },
+    { name: "Id-Ul-Zuha", short: "Bakrid", date: "2026-05-27" },
+    { name: "Maharana Pratap Jayanti", short: "Pratap J.", date: "2026-06-17" },
+    { name: "Independence Day", short: "Ind. Day", date: "2026-08-15" },
+    { name: "Raksha Bandhan", short: "Rakhi", date: "2026-08-28" },
+    { name: "Gandhi Jayanti", short: "Gandhi J.", date: "2026-10-02" },
+    { name: "Dussehra", short: "Dussehra", date: "2026-10-20" },
+    { name: "Govardhan Puja", short: "Govardhan", date: "2026-11-09" },
+    { name: "Bhai Dooj", short: "Bhai Dooj", date: "2026-11-11" },
+    { name: "Gurunanak Jayanti", short: "Nanak J.", date: "2026-11-24" },
+    { name: "Christmas Day", short: "Xmas", date: "2026-12-25" }
+  ];
 
-  /* Crew anchors */
   const crews = {
-    // A-crew: 1 Feb 2026 = first N block
     A: { date: new Date(2026, 1, 1), index: 10 },
-
-    // B-crew: 1 Jan 2026 = third M
     B: { date: new Date(2026, 0, 1), index: 7 },
-
-    // C-crew: 1 Jan 2026 = last E
     C: { date: new Date(2026, 0, 1), index: 3 },
-
-    // D-crew: 2 Jan 2026 = first E
     D: { date: new Date(2026, 0, 2), index: 0 }
   };
 
+  let currentCrew = 'A';
+  const today = new Date();
   const app = document.getElementById('app');
   const monthSelect = document.getElementById('monthSelect');
-  const prevBtn = document.getElementById('prevMonth');
-  const nextBtn = document.getElementById('nextMonth');
-  const crewSelect = document.getElementById('crewSelect');
 
   function daysBetween(d1, d2) {
-    return Math.floor((d2 - d1) / (24 * 60 * 60 * 1000));
+    const date1 = new Date(d1.getFullYear(), d1.getMonth(), d1.getDate());
+    const date2 = new Date(d2.getFullYear(), d2.getMonth(), d2.getDate());
+    return Math.round((date2 - date1) / 86400000);
   }
 
   function getShift(date) {
-    const crew = crews[crewSelect.value];
+    const crew = crews[currentCrew];
     const diff = daysBetween(crew.date, date);
     const idx = (crew.index + diff % rotation.length + rotation.length) % rotation.length;
     return rotation[idx];
@@ -198,7 +220,6 @@
 
   function renderMonth(month) {
     app.innerHTML = '';
-
     const firstDay = new Date(year, month, 1);
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const startWeekday = firstDay.getDay();
@@ -213,88 +234,63 @@
       grid.appendChild(h);
     });
 
-    for (let i = 0; i < startWeekday; i++) {
-      grid.appendChild(document.createElement('div'));
-    }
+    for (let i = 0; i < startWeekday; i++) grid.appendChild(document.createElement('div'));
 
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
-      const todaysFestivals = festivals.filter(f => {
-      const d = new Date(f.date);
-      return d.toDateString() === date.toDateString();
-    });
       const shift = getShift(date);
+      const isToday = date.toDateString() === today.toDateString();
+      
+      // Match festivals (Handling timezone issues by comparing strings)
+      const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      const foundFestivals = festivals.filter(f => f.date === dateString);
 
       const cell = document.createElement('div');
-      cell.className = 'cell';
+      cell.className = `cell ${isToday ? 'today' : ''}`;
 
-      const dEl = document.createElement('div');
-      dEl.className = 'date';
-      dEl.textContent = day;
+      let festHtml = '';
+      foundFestivals.forEach(f => {
+        festHtml += `<div class="festival-label">${f.short}</div>`;
+      });
 
-      const sEl = document.createElement('div');
-      sEl.className = 'shift ' + shift;
-      sEl.textContent = shift;
-
-      if (date.toDateString() === today.toDateString()) {
-        sEl.classList.add('today');
-      }
-
-      cell.appendChild(dEl);
-      cell.appendChild(sEl);
-
-      // ---- Add festival label inside cell ----
-      if (todaysFestivals.length > 0) {
-        const fEl = document.createElement('div');
-        fEl.className = 'festival-label';
-
-        fEl.innerHTML = todaysFestivals
-          .map(f => f.short || f.name)
-          .join('<br>');
-
-        cell.appendChild(fEl);
-      }
+      cell.innerHTML = `
+        <div class="date">${day}</div>
+        <div class="shift ${shift}">${shift}</div>
+        ${festHtml}
+      `;
       grid.appendChild(cell);
     }
-
     app.appendChild(grid);
-    // ---- Festival rendering ----
-const monthFestivals = festivals.filter(f => {
-  const d = new Date(f.date);
-  return d.getMonth() === month;
-});
 
-if (monthFestivals.length > 0) {
-  const box = document.createElement('div');
-  box.className = 'festival-box';
+    // Month festival list
+    const monthFestivals = festivals.filter(f => {
+      const d = new Date(f.date);
+      return d.getMonth() === month;
+    });
 
-  const title = document.createElement('div');
-  title.className = 'festival-title';
-  title.textContent = "Festivals";
-  box.appendChild(title);
-
-  monthFestivals.forEach(f => {
-    const d = new Date(f.date);
-
-    const item = document.createElement('div');
-    item.className = 'festival-item';
-
-    const name = document.createElement('span');
-    name.textContent = f.name;
-
-    const date = document.createElement('span');
-    date.textContent = d.getDate();
-
-    item.appendChild(name);
-    item.appendChild(date);
-    box.appendChild(item);
-  });
-
-  app.appendChild(box);
-}
+    if (monthFestivals.length) {
+      const box = document.createElement('div');
+      box.className = 'festival-box';
+      box.innerHTML = `<div class="festival-title">Holidays</div>`;
+      monthFestivals.forEach(f => {
+        const d = new Date(f.date).getDate();
+        box.innerHTML += `<div class="festival-item"><span>${f.name}</span><span>${d}</span></div>`;
+      });
+      app.appendChild(box);
+    }
   }
 
-  // Month dropdown
+  /* Crew Selection Button Logic */
+  document.querySelectorAll('.crewBtn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.crewBtn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentCrew = btn.dataset.crew;
+      renderMonth(+monthSelect.value);
+    });
+  });
+
+  // Init Month Select
   for (let m = 0; m < 12; m++) {
     const opt = document.createElement('option');
     opt.value = m;
@@ -303,113 +299,19 @@ if (monthFestivals.length > 0) {
   }
 
   monthSelect.addEventListener('change', () => renderMonth(+monthSelect.value));
-  crewSelect.addEventListener('change', () => renderMonth(+monthSelect.value));
-
-  prevBtn.addEventListener('click', () => {
-    let m = Number(monthSelect.value) - 1;
-    if (m < 0) m = 11;
-    monthSelect.value = m;
-    renderMonth(m);
+  document.getElementById('prevMonth').addEventListener('click', () => {
+    monthSelect.value = (Number(monthSelect.value) + 11) % 12;
+    renderMonth(+monthSelect.value);
+  });
+  document.getElementById('nextMonth').addEventListener('click', () => {
+    monthSelect.value = (Number(monthSelect.value) + 1) % 12;
+    renderMonth(+monthSelect.value);
   });
 
-  nextBtn.addEventListener('click', () => {
-    let m = Number(monthSelect.value) + 1;
-    if (m > 11) m = 0;
-    monthSelect.value = m;
-    renderMonth(m);
-  });
-  crewSelect.addEventListener('change', () => renderMonth(+monthSelect.value));
+  const currentMonth = (today.getFullYear() === year) ? today.getMonth() : 0;
+  monthSelect.value = currentMonth;
+  renderMonth(currentMonth);
 
-  const defaultMonth = (today.getFullYear() === year) ? today.getMonth() : 0;
-  monthSelect.value = defaultMonth;
-  renderMonth(defaultMonth);
-</script>
-
-<script>
-  // ---- PWA SETUP (no extra files needed) ----
-  const manifest = {
-    name: "Crew Shift Calendar",
-    short_name: "ShiftCal",
-    start_url: ".",
-    display: "standalone",
-    background_color: "#020617",
-    theme_color: "#020617",
-    icons: [
-      {
-        src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23020617'/%3E%3Ctext x='50' y='65' font-size='48' text-anchor='middle' fill='white'%3EC%3C/text%3E%3C/svg%3E",
-        sizes: "192x192",
-        type: "image/svg+xml"
-      }
-    ]
-  };
-
-  const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
-  const manifestURL = URL.createObjectURL(manifestBlob);
-
-  const link = document.createElement('link');
-  link.rel = 'manifest';
-  link.href = manifestURL;
-  document.head.appendChild(link);
-
-  if ('serviceWorker' in navigator) {
-    const swCode = `
-      const CACHE = 'shift-calendar-v1';
-      self.addEventListener('install', e => {
-        e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./'])));
-      });
-      self.addEventListener('fetch', e => {
-        e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
-      });
-    `;
-
-    const swBlob = new Blob([swCode], { type: 'text/javascript' });
-    const swURL = URL.createObjectURL(swBlob);
-
-    navigator.serviceWorker.register(swURL);
-  }
-</script>
-<script>
-  // ---- PWA SETUP (no extra files needed) ----
-  const manifest = {
-    name: "Crew Shift Calendar",
-    short_name: "ShiftCal",
-    start_url: ".",
-    display: "standalone",
-    background_color: "#020617",
-    theme_color: "#020617",
-    icons: [
-      {
-        src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23020617'/%3E%3Ctext x='50' y='65' font-size='48' text-anchor='middle' fill='white'%3EC%3C/text%3E%3C/svg%3E",
-        sizes: "192x192",
-        type: "image/svg+xml"
-      }
-    ]
-  };
-
-  const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
-  const manifestURL = URL.createObjectURL(manifestBlob);
-
-  const link = document.createElement('link');
-  link.rel = 'manifest';
-  link.href = manifestURL;
-  document.head.appendChild(link);
-
-  if ('serviceWorker' in navigator) {
-    const swCode = `
-      const CACHE = 'shift-calendar-v1';
-      self.addEventListener('install', e => {
-        e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./'])));
-      });
-      self.addEventListener('fetch', e => {
-        e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
-      });
-    `;
-
-    const swBlob = new Blob([swCode], { type: 'text/javascript' });
-    const swURL = URL.createObjectURL(swBlob);
-
-    navigator.serviceWorker.register(swURL);
-  }
 </script>
 </body>
 </html>
